@@ -1,0 +1,43 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FinantierPay - Withdraw Wallet</title>
+<link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+<link href="/font-awesome/css/fontawesome.min.css" rel="stylesheet" />
+<link href="/font-awesome/css/brands.min.css" rel="stylesheet" />
+<link href="/font-awesome/css/solid.min.css" rel="stylesheet" />
+<script src="/jquery/jquery.min.js"></script>
+<script src="/bootstrap/js/bootstrap.min.js"></script>
+<style th:replace="fragments/FinantierPay_style"></style>
+</head>
+<body>
+	<div th:replace="fragments/FinantierPay_header"></div>
+	<script src="https://www.paypalobjects.com/payouts/js/payouts_aac.js"></script>
+	<!-- Set up a container for ACC to be rendered into -->
+	<div id="container"></div>
+	<script>
+		// Render the AAC component
+		paypal.PayoutsAAC.render({
+			// Use sandbox for testing
+			env : "sandbox",
+			clientId : {
+/* 				production : "<production clientId>", */
+				sandbox : "AbSiWZUdeEjSkhSp4I_KOwWUgU7X462zwPKpbKd1EL2tVBeLveAJIupZZQu-0hRkgJvXQtF-JeKtbGYj"
+			},
+			merchantId : "T2HTKWHAQALBL",
+			pageType : "login",
+			onLogin : function(response) {
+				if (response.err) {
+					console.log(response.err)
+				} else {
+					console.log(response.body.code);
+				}
+			}
+		}, '#container');
+	</script>
+	<div class="fixed-bottom">
+		<div th:replace="fragments/FinantierPay_footer"></div>
+	</div>
+</body>
+</html>

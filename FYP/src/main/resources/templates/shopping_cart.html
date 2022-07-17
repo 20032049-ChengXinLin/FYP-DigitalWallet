@@ -1,0 +1,176 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymelead.org/extras/spring-security">
+<head>
+<title>Sport Shoes - Shopping Cart</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+<link href="/font-awesome/css/fontawesome.min.css" rel="stylesheet" />
+<link href="/font-awesome/css/brands.min.css" rel="stylesheet" />
+<link href="/font-awesome/css/solid.min.css" rel="stylesheet" />
+<script src="/bootstrap/css/bootstrap.js"></script>
+<script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/jquery/jquery.min.js"></script>
+<style>
+/* Header Styling*/
+body {
+	background-image: url("/images/CSWShoes_background.png");
+	background-size: cover;
+	font-family: 'Merienda', cursive;
+	padding-top: 65px;
+}
+
+a {
+	text-decoration: none;
+	color: white;
+}
+
+header img {
+	mix-blend-mode: multiply;
+}
+/* End Of Header Styling*/
+table, .bg-info {
+	box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px
+		rgba(0, 0, 0, 0.23);
+}
+
+.col-lg-5 p {
+	opacity: 0.7;
+}
+</style>
+
+</head>
+<body>
+	<div th:replace="fragments/CSWShoes_header"></div>
+	<br>
+	<section>
+		<div class="container">
+			<div class="row">
+				<h4>View Shopping Cart</h4>
+				<div class="col-lg-7" style="margin-right: 2%;">
+					<table class="table bordered table-striped table-hover bg-white">
+						<thead class="table-info">
+							<tr>
+								<th>Product</th>
+								<th>Price</th>
+							</tr>
+						</thead>
+						<tbody>
+							<th:block th:each="cartList : ${cartList}"
+								th:id="${cartList.shoppingCartId}">
+								<tr>
+									<td>
+										<div class="row">
+											<div class="col-lg-4">
+												<img
+													th:src="@{/uploads/products/{id}/{imageName}(id=${cartList.product.productsId}, imageName=${cartList.product.image})}"
+													width=150, height=150>
+
+											</div>
+											<div class="col-lg-5">
+												<p th:text="${cartList.product.name}"></p>
+												<p th:text="${cartList.product.gender}"></p>
+												<form
+													th:action="@{/shoppingcart/edit/{id}(id=${cartList.shoppingCartId})}"
+													method="post">
+													<p>
+														<label>Size:</label> <select name="shoesize"
+															onchange="this.form.submit()">
+															<option th:text="${cartList.shoesize}"
+																th:value="${cartList.shoesize}"></option>
+															<option
+																th:each="size : ${#strings.arraySplit(cartList.product.size, ',')}"
+																th:value="${size}" th:text="${size}"
+																th:if="${size != cartList.shoesize}"></option>
+														</select>
+
+													</p>
+													<p>
+														<label> Quantity:</label> <input type="number"
+															th:value="${cartList.quantity}" min="1"
+															th:max="${cartList.product.quantity}"
+															onchange="this.form.submit()" name="qty"
+															th:if="${cartList.product.quantity>0}" /> <span
+															th:if="${cartList.product.quantity==0}">Sorry this
+															item is not available</span>
+													</p>
+
+													<a
+														th:href="@{/shoppingcart/delete/{id}(id=${cartList.shoppingCartId})}"
+														style="text-decoration: underline; color: blue;">Delete</a>
+												</form>
+											</div>
+										</div>
+									</td>
+									<td th:text="${#numbers.formatCurrency(cartList.subTotal)}"></td>
+								</tr>
+						</tbody>
+					</table>
+				</div>
+				<!-- Order summary -->
+				<div class="col-lg-4">
+					<div class="bg-info" style="padding: 10px;">
+						<div class="row m-3 border-bottom fw-bold">
+							<div class="col text-center fs-3">ORDER SUMMARY</div>
+						</div>
+						<!-- Order summary rows -->
+						<div class="row m-3 border-bottom"
+							th:each="cartList : ${cartList}"
+							th:if="${cartList.product.quantity!=0}">
+							<div class="col fs-6">
+								<p
+									th:text="${cartList.product.name} + ' x ' + ${cartList.quantity}"
+									style="opacity: 0.7"></p>
+								<p th:text="'Size: ' + ${cartList.shoesize}"
+									style="opacity: 0.7"></p>
+							</div>
+							<div class="col fs-6 text-end">
+								<p id="subTotal" th:text="'$'+${cartList.subTotal}"
+									style="opacity: 0.7"></p>
+							</div>
+						</div>
+
+						<div class="row m-3 border-bottom fw-bold">
+							<div class="col fs-6">
+								<p>Delivery Fees:</p>
+							</div>
+							<div class="col fs-6 text-end">
+								<p id="cartTotal"
+									th:text="${#numbers.formatCurrency(deliveryfees)}"></p>
+							</div>
+						</div>
+						<div class="row m-3 border-bottom fw-bold">
+							<div class="col fs-6">
+								<p>TOTAL</p>
+							</div>
+							<div class="col fs-6 text-end">
+								<p id="cartTotal"
+									th:text="${#numbers.formatCurrency(cartTotal)}"
+									th:value="${cartTotal}"></p>
+							</div>
+						</div>
+						<div class="row m-3 border-bottom">
+
+							<!-- Do not modify the id and name, Change the value to the Shopping Cart total value name-->
+							<input type="hidden" id="totalAmt" name="totalAmt"
+								th:value="${cartTotal}">
+
+							<!-- Link to FinantierPay Button, Do not change the id name -->
+							<a id="finantierPayLink"></a>
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Put this script before the end body tag, Change the wallet ID to your own FinantierPay wallet ID-->
+	<script type="text/javascript" id="finantierPay" 
+	src="http://localhost:8080/finantierPay/finantierPayPayment.js?walletId=2&storeName=CSWShoes&Redirect-URL=http://localhost:8080/transaction_successful"></script>
+	<!-- End of Script -->
+
+	<br>
+	<div th:replace="fragments/CSWShoes_footer"></div>
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>CSW Shoes - Page two</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+<link href="/font-awesome/css/fontawesome.min.css" rel="stylesheet" />
+<link href="/font-awesome/css/brands.min.css" rel="stylesheet" />
+<link href="/font-awesome/css/solid.min.css" rel="stylesheet" />
+<script src="/bootstrap/css/bootstrap.js"></script>
+<script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+<style>
+/* Header Styling*/
+body {
+	background-image: url("/images/CSWShoes_background.png");
+	background-size: cover;
+	font-family: 'Merienda', cursive;
+	padding-top: 65px;
+}
+
+a {
+	text-decoration: none;
+	color: white;
+}
+
+header img {
+	mix-blend-mode: multiply;
+}
+/* End Of Header Styling*/
+.col-lg {
+	padding: 20px;
+}
+
+section img {
+	box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px
+		rgba(0, 0, 0, 0.23);
+}
+
+h3 {
+	font-family: 'Gloria Hallelujah', cursive;
+	color: Blue;
+}
+
+.size {
+	width: 22%;
+	margin: 5px;
+}
+</style>
+
+</head>
+<body>
+	<div th:replace="fragments/CSWShoes_header"></div>
+	<section>
+		<div class="container">
+			<form class="needs-validation"
+				th:action="@{/shoppingcart/add/{id}(id=${listProducts.productsId})}"
+				method="post" novalidate>
+				<div class="row" th:each="products : ${listProducts}"
+					th:id="${products.productsId}">
+					<div class="col-lg">
+						<img
+							th:src="@{/uploads/products/{id}/{imageName}(id=${products.productsId}, imageName=${products.image})}"
+							width=100% height=100%>
+					</div>
+					<div class="col-lg">
+						<h3 th:text="${products.brand} + ' ' + ${products.gender}"></h3>
+						<p th:text="${products.name}"></p>
+						<p class="price">
+							<b><span style="color: red; font-family: 'Handlee', cursive;"
+								th:text="${#numbers.formatCurrency(products.price)}"></span></b>
+						</p>
+						<i class="fa fa-star fa-2x" style="color: yellow;"></i> <i
+							class="fa fa-star fa-2x" style="color: yellow;"></i> <i
+							class="fa fa-star fa-2x" style="color: yellow;"></i> <i
+							class="fa fa-star fa-2x"></i> <i class="fa fa-star fa-2x"></i>
+						<h4>
+							<a href="/sizechart" style="color: red;">Size Chart</a>
+						</h4>
+						<p th:text=" ${'Quantity: ' + products.quantity}"></p>
+						<div class="d-md-block">
+							<!-- Back-end validation when there is no error -->
+							<div th:if="${(message == null)}">
+								<fieldset name="check" id="border">
+									<div class="btn-group size" role="group"
+										aria-label="Basic radio toggle button group"
+										th:each="size : ${#strings.arraySplit(products.size, ',')}"
+										th:if="${products.quantity != 0}">
+										<input type="radio" class="btn-check" th:id="${size}"
+											autocomplete="off" th:value="${size}" name="shoesize"
+											oninput="checkSize(this);" required> <label
+											class="btn btn-outline-dark" th:for="${size}"
+											th:text="${size}"></label>
+									</div>
+									<p th:if="${products.quantity == 0}">Sorry this products is
+										not available</p>
+								</fieldset>
+								<div class="invalid-feedback">Please choose a Shoes Size</div>
+								<div th:if="${message}" th:text="${message}" class="text-danger"></div>
+							</div>
+							<!-- Back-end validation when there is error, it will show red border -->
+							<div th:if="${(message != null)}" class="border border-danger">
+								<fieldset>
+									<div class="btn-group size" role="group"
+										aria-label="Basic radio toggle button group"
+										th:each="size : ${#strings.arraySplit(products.size, ',')}">
+										<input type="radio" class="btn-check" th:id="${size}"
+											autocomplete="off" th:value="${size}" name="shoesize"
+											oninput="checkSize(this);" required> <label
+											class="btn btn-outline-dark" th:for="${size}"
+											th:text="${size}"></label>
+									</div>
+								</fieldset>
+							</div>
+							<div class="invalid-feedback">Please choose a Shoes Size</div>
+							<div th:if="${message}" th:text="${message}" class="text-danger"></div>
+						</div>
+						<div class="d-md-block">
+							<input type="number" value="1" name="quantity" hidden>
+						</div>
+						<hr>
+						<h5>Product Description</h5>
+
+						<p th:text="${products.description}"></p>
+						<p>
+							<b>Product Code: </b> <span th:text="${products.productCode}"></span>
+						</p>
+						<div class="d-grid gap-2">
+							<button type="Submit" class="btn btn-success btn-lg"
+								th:if="${products.quantity != 0}"
+								sec:authorize="!hasRole('ADMIN')">Add to Cart</button>
+							<div sec:authorize="hasRole('ADMIN')">
+								<h4 class="text-danger">Sorry You Are not Allowed to Made
+									Payment</h4>
+							</div>
+						</div>
+					</div>
+				</div>
+			</form>
+			<!-- Form Validation -->
+			<script>
+				function checkSize(fieldSize) {
+					if (fieldSize.value != 0) {
+						document.getElementById("border").style.border = "none";
+					}
+				}
+				'use strict'
+				var form = document.querySelector('.needs-validation')
+				form
+						.addEventListener(
+								'submit',
+								function(event) {
+
+									if (!form.checkValidity()) {
+										event.preventDefault()
+										event.stopPropagation()
+										document.getElementById("border").style.border = "1px solid red";
+									}
+
+									form.classList.add('was-validated')
+								})
+			</script>
+		</div>
+	</section>
+
+	<br>
+	<div th:replace="fragments/CSWShoes_footer"></div>
+</body>
+</html>
