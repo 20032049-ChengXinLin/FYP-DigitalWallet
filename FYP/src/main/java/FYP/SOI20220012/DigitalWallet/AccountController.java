@@ -25,6 +25,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -65,6 +66,9 @@ public class AccountController {
 
 	@Autowired
 	private NotificationsService notificationsService;
+	
+	@Autowired
+	private JavaMailSender javaMailSender;
 
 	@GetMapping("/register")
 	public String registerAccount(Model model) {
@@ -479,7 +483,8 @@ public class AccountController {
 			notifications.setAccount(account);
 			notifications.setDateTime(currentdateTime);
 			notifications.setTitle("Sorry Your account will not be deleted!");
-			notifications.setMessage("Sorry! Your account will not be deleted. You have existing money inside your wallet" + ".");
+			notifications.setMessage(
+					"Sorry! Your account will not be deleted. You have existing money inside your wallet" + ".");
 			notificationsRepository.save(notifications);
 			int unread = notificationsService.unreadNotificiations();
 			model.addAttribute("unread", unread);
@@ -488,12 +493,28 @@ public class AccountController {
 			Account account = accountRepository.getById(accountId);
 			LocalDate currentdate = LocalDate.now();
 			account.setDate_deleted(currentdate);
+			LocalDate plus30days = currentdate.plusDays(30);
 			accountRepository.save(account);
+			String subject = "Requested to deleted your FinantierPay Account!";
+			String body = "Dear " + account.getUsername()
+					+ ",\n\nYou have requested to deleted your account.\n Your account will be deleted on " + plus30days
+					+ ".\n If you wish to continue to access your account, you will be able to do so within the 30 days and your account will not be deleted. \n\n Thank you! \n\nBest Regards, \nFinantierPay";
+			String to = account.getEmail();
+			sendEmail(to, subject, body);
 		}
 		int unread = notificationsService.unreadNotificiations();
 		model.addAttribute("unread", unread);
 
 		return "delete_account_success";
 	}
-
+	
+	public void sendEmail(String to, String subject, String body) {
+		SimpleMailMessage msg = new SimpleMailMessage();
+		String fromAddress = "finantierpay@outlook.com";
+		msg.setFrom(fromAddress);
+		msg.setTo(to);
+		msg.setSubject(subject);
+		msg.setText(body);
+		javaMailSender.send(msg);
+	}
 }

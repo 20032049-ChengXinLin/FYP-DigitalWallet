@@ -28,6 +28,8 @@ import java.util.Random;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -60,6 +62,9 @@ public class FinantierPayLoginController {
 
 	@Autowired
 	private NotificationsRepository notificationsRepository;
+	
+	@Autowired
+	private JavaMailSender javaMailSender;
 
 	@GetMapping("/login")
 	public String login() {
@@ -74,11 +79,16 @@ public class FinantierPayLoginController {
 				LocalDate dateDeleted = accountDates.get(p).getDate_deleted();
 				System.out.println(dateDeleted);
 				if (dateDeleted != null) {
-					LocalDate nowPlus30Days = dateDeleted.plusDays(30);
+					LocalDate nowPlus30Days = dateDeleted.plusDays(1);
 
 					if (currentDate.compareTo(nowPlus30Days) > 0) {
 						accountDates.get(p).setLocked(false);
 						accountRepository.save(accountDates.get(p));
+						String subject = "Successfully deleted your FinantierPay Account!";
+						String body = "Dear " + accountDates.get(p).getUsername()
+								+ ",\n\nYou have succesfully deleted your account.\nYou will not be able to login again.\nThank you.\n\nBest Regards, \nFinantierPay";
+						String to = accountDates.get(p).getEmail();
+						sendEmail(to, subject, body);
 					}
 				}
 			}
@@ -327,7 +337,7 @@ public class FinantierPayLoginController {
 				if (currentDate.compareTo(nowPlus9Months) > 0) {
 					if (currentDate.compareTo(nowPlus12Months) > 0) {
 						System.out.println("12");
-						if (accountList.get(i).getBalance_points() != 0 && accountList.get(i).getTotal_points() != 0) {
+						if (accountList.get(i).getBalance_points() != 0 || accountList.get(i).getTotal_points() != 0) {
 							if (accountList.get(i).getMembership_levels().equalsIgnoreCase("GOLD")) {
 
 								accountList.get(i).setBalance_points(0);
@@ -380,7 +390,7 @@ public class FinantierPayLoginController {
 						}
 					} else {
 						System.out.println("9");
-						if (accountList.get(i).getBalance_points() != 0 && accountList.get(i).getTotal_points() != 0) {
+						if (accountList.get(i).getBalance_points() != 0 || accountList.get(i).getTotal_points() != 0) {
 							if (accountList.get(i).getMembership_levels().equalsIgnoreCase("GOLD")) {
 
 								accountList.get(i).setBalance_points(0);
@@ -613,7 +623,17 @@ public class FinantierPayLoginController {
 
 		return "login";
 	}
-
+	
+	public void sendEmail(String to, String subject, String body) {
+		SimpleMailMessage msg = new SimpleMailMessage();
+		String fromAddress = "finantierpay@outlook.com";
+		msg.setFrom(fromAddress);
+		msg.setTo(to);
+		msg.setSubject(subject);
+		msg.setText(body);
+		javaMailSender.send(msg);
+	}
+	
 	@GetMapping("/403")
 	public String error403() {
 
