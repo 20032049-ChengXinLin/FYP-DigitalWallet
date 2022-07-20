@@ -21,13 +21,19 @@
 							createOrder : function(data, actions) {
 								// This function sets up the details of the transaction, 
 								// including the amount and line item details.
-								return actions.order.create({
-									purchase_units : [ {
-										amount : {
-											value : topUpTotal
-										}
-									} ]
-								});
+								return actions.order
+										.create({
+											 intent: 'CAPTURE',
+											purchase_units : [ {
+												amount : {
+													value : topUpTotal
+												},
+												payee : {
+													email_address : 'rpmary@gmail.com'
+												}
+											} ]
+
+										});
 							},
 							onApprove : function(data, actions) {
 								// This function captures the funds from the transaction.

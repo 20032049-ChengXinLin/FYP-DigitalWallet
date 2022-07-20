@@ -1,43 +1,633 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+<title>FinantierPay - Withdraw Money</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FinantierPay - Withdraw Wallet</title>
-<link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+<link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 <link href="/font-awesome/css/fontawesome.min.css" rel="stylesheet" />
 <link href="/font-awesome/css/brands.min.css" rel="stylesheet" />
 <link href="/font-awesome/css/solid.min.css" rel="stylesheet" />
+<script src="/bootstrap/css/bootstrap.js"></script>
+<script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="/jquery/jquery.min.js"></script>
-<script src="/bootstrap/js/bootstrap.min.js"></script>
+<script
+	src="https://www.paypal.com/sdk/js?client-id=AbSiWZUdeEjSkhSp4I_KOwWUgU7X462zwPKpbKd1EL2tVBeLveAJIupZZQu-0hRkgJvXQtF-JeKtbGYj&currency=SGD&components=buttons">
+	
+</script>
+<!-- <script 
+src="https://api.ocbc.com:8243/transactional/paynowqr/1.0/payNowQR/Authorization:%20Bearer%06e9e9cc-1924-3216-a256-e0ea8f7c1aeb"> 
+ 
+</script> 
+<script src="http://localhost:8080/login#access_token=83df29ca-74c0-39be-a6a4-7006b827af26&token_type=Bearer&expires_in=3600"></script> -->
+<script
+	src="https://js.braintreegateway.com/web/dropin/1.33.2/js/dropin.min.js"></script>
+<script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
 <style th:replace="fragments/FinantierPay_style"></style>
+<!-- To be replaced with your own stylesheet -->
+  <link rel="stylesheet" type="text/css" href="https://www.paypalobjects.com/webstatic/en_US/developer/docs/css/cardfields.css"/>
+  <!-- Express fills in the clientId and clientToken variables -->
+  <script
+    src="https://www.paypal.com/sdk/js?components=buttons,hosted-fields&client-id=<%= clientId %>"
+    data-client-token="<%= clientToken %>"
+    
+  ></script>
+   <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://www.paypalobjects.com/webstatic/en_US/developer/docs/css/cardfields.css"
+    />
+<style>
+.dollarButton {
+	border-radius: 10px;
+	background: #F5B7B1;
+	background-position: left top;
+	background-repeat: repeat;
+	padding: 10px;
+	width: 110px;
+	height: 70px;
+	font-size: 18px;
+}
+
+.grid-container {
+	display: grid;
+	justify-content: start;
+	grid-template-columns: auto auto auto;
+	/*Make the grid smaller than the container*/
+	gap: 25px;
+	padding: 5px;
+}
+
+/* .grid-container div { 
+ text-align: center; 
+ padding: 10px 0; 
+} */
+</style>
 </head>
 <body>
 	<div th:replace="fragments/FinantierPay_header"></div>
-	<script src="https://www.paypalobjects.com/payouts/js/payouts_aac.js"></script>
-	<!-- Set up a container for ACC to be rendered into -->
-	<div id="container"></div>
-	<script>
-		// Render the AAC component
-		paypal.PayoutsAAC.render({
-			// Use sandbox for testing
-			env : "sandbox",
-			clientId : {
-/* 				production : "<production clientId>", */
-				sandbox : "AbSiWZUdeEjSkhSp4I_KOwWUgU7X462zwPKpbKd1EL2tVBeLveAJIupZZQu-0hRkgJvXQtF-JeKtbGYj"
-			},
-			merchantId : "T2HTKWHAQALBL",
-			pageType : "login",
-			onLogin : function(response) {
-				if (response.err) {
-					console.log(response.err)
-				} else {
-					console.log(response.body.code);
-				}
-			}
-		}, '#container');
-	</script>
-	<div class="fixed-bottom">
-		<div th:replace="fragments/FinantierPay_footer"></div>
+	<!-- <div class="container">
+		<script src="https://www.paypalobjects.com/payouts/js/payouts_aac.js"></script>
+		Set up a container for ACC to be rendered into
+		<div id="container"></div>
+		<script>
+			// Render the AAC component 
+			paypal.PayoutsAAC
+					.render(
+							{
+								// Use sandbox for testing 
+								env : "sandbox",
+								clientId : {
+									sandbox : "AbSiWZUdeEjSkhSp4I_KOwWUgU7X462zwPKpbKd1EL2tVBeLveAJIupZZQu-0hRkgJvXQtF-JeKtbGYj"
+								},
+								merchantId : "T2HTKWHAQALBL",
+								pageType : "login",
+								onLogin : function(response) {
+
+									if (response.err) {
+										console.log(response.err)
+									} else {
+										console.log(response.body.code);
+									}
+								}
+							}, '#container');
+		</script>
 	</div>
+		<div id="paypal-button-container" class="paypal-button-container"></div>
+	<div class="card_container">
+		<form id="card-form">
+			<label for="card-number">Card Number</label>
+			<div id="card-number" class="card_field"></div>
+			<div style="display: flex; flex-direction: row;">
+				<div>
+					<label for="expiration-date">Expiration Date</label>
+					<div id="expiration-date" class="card_field"></div>
+				</div>
+				<div style="margin-left: 10px;">
+					<label for="cvv">CVV</label>
+					<div id="cvv" class="card_field"></div>
+				</div>
+			</div>
+			<label for="card-holder-name">Name on Card</label> <input type="text"
+				id="card-holder-name" name="card-holder-name" autocomplete="off"
+				placeholder="card holder name" />
+			<div>
+				<label for="card-billing-address-street">Billing Address</label> <input
+					type="text" id="card-billing-address-street"
+					name="card-billing-address-street" autocomplete="off"
+					placeholder="street address" />
+			</div>
+			<div>
+				<label for="card-billing-address-unit">&nbsp;</label> <input
+					type="text" id="card-billing-address-unit"
+					name="card-billing-address-unit" autocomplete="off"
+					placeholder="unit" />
+			</div>
+			<div>
+				<input type="text" id="card-billing-address-city"
+					name="card-billing-address-city" autocomplete="off"
+					placeholder="city" />
+			</div>
+			<div>
+				<input type="text" id="card-billing-address-state"
+					name="card-billing-address-state" autocomplete="off"
+					placeholder="state" />
+			</div>
+			<div>
+				<input type="text" id="card-billing-address-zip"
+					name="card-billing-address-zip" autocomplete="off"
+					placeholder="zip / postal code" />
+			</div>
+			<div>
+				<input type="text" id="card-billing-address-country"
+					name="card-billing-address-country" autocomplete="off"
+					placeholder="country code" />
+			</div>
+			<br /> <br />
+			<button value="submit" id="submit" class="btn">Pay</button>
+		</form>
+	</div>
+	<script>
+	const paypal = require('@paypal/payouts-sdk');
+	  
+	// Creating an environment
+	let clientId = "AbSiWZUdeEjSkhSp4I_KOwWUgU7X462zwPKpbKd1EL2tVBeLveAJIupZZQu-0hRkgJvXQtF-JeKtbGYj";
+	let clientSecret = "EAym33igu_vaWHcM1yd1xU2Qc9j6L5neWp7n16oeMONrT4w0ecQDsUuUZOf-iumW4cQx6JoKFpUevxMz";
+	let environment = new paypal.core.SandboxEnvironment(clientId, clientSecret);
+	let client = new paypal.core.PayPalHttpClient(environment);
+
+	let requestBody = {
+	    "sender_batch_header": {
+	      "recipient_type": "EMAIL",
+	      "email_message": "SDK payouts test txn",
+	      "note": "Enjoy your Payout!!",
+	      "sender_batch_id": "Test_sdk_1",
+	      "email_subject": "This is a test transaction from SDK"
+	    },
+	    "items": [{
+	      "note": "Your 1$ Payout!",
+	      "amount": {
+	        "currency": "USD",
+	        "value": "1.00"
+	      },
+	      "receiver": "payout-sdk-1@paypal.com",
+	      "sender_item_id": "Test_txn_1"
+	    }, {
+	      "note": "Your 1$ Payout!",
+	      "amount": {
+	        "currency": "USD",
+	        "value": "1.00"
+	      },
+	      "receiver": "payout-sdk-2@paypal.com",
+	      "sender_item_id": "Test_txn_2"
+	    }, {
+	      "note": "Your 1$ Payout!",
+	      "amount": {
+	        "currency": "USD",
+	        "value": "1.00"
+	      },
+	      "receiver": "payout-sdk-3@paypal.com",
+	      "sender_item_id": "Test_txn_3"
+	    }, {
+	      "note": "Your 1$ Payout!",
+	      "amount": {
+	        "currency": "USD",
+	        "value": "1.00"
+	      },
+	      "receiver": "payout-sdk-4@paypal.com",
+	      "sender_item_id": "Test_txn_4"
+	    }, {
+	      "note": "Your 1$ Payout!",
+	      "amount": {
+	        "currency": "USD",
+	        "value": "1.00"
+	      },
+	      "receiver": "payout-sdk-5@paypal.com",
+	      "sender_item_id": "Test_txn_5"
+	    }]
+	  }
+
+	// Construct a request object and set desired parameters
+	// Here, PayoutsPostRequest() creates a POST request to /v1/payments/payouts
+	let request = new paypal.payouts.PayoutsPostRequest();
+	request.requestBody(requestBody);
+
+	// Call API with your client and get a response for your call
+	let createPayouts  = async function(){
+	        let response = await client.execute(request);
+	        console.log(`Response: ${JSON.stringify(response)}`);
+	        // If call returns body in response, you can get the deserialized version from the result attribute of the response.
+	        console.log(`Payouts Create Response: ${JSON.stringify(response.result)}`);
+	}
+	createPayouts();
+	</script>
+	<script>
+	/* paypal.Buttons({
+        // Sets up the transaction when a payment button is clicked
+        createOrder: function (data, actions) {
+          return fetch("/api/orders", {
+            method: "post",
+            // use the "body" param to optionally pass additional order information
+            // like product ids or amount
+          })
+            .then((response) => response.json())
+            .then((order) => order.id);
+        },
+        // Finalize the transaction after payer approval
+        onApprove: function (data, actions) {
+          return fetch(`/api/orders/${data.orderID}/capture`, {
+            method: "post",
+          })
+            .then((response) => response.json())
+            .then((orderData) => {
+              // Successful capture! For dev/demo purposes:
+              console.log(
+                "Capture result",
+                orderData,
+                JSON.stringify(orderData, null, 2)
+              );
+              const transaction = orderData.purchase_units[0].payments.captures[0];
+              alert(`Transaction ${transaction.status}: ${transaction.id}
+                See console for all available details
+              `);
+              // When ready to go live, remove the alert and show a success message within this page. For example:
+              // var element = document.getElementById('paypal-button-container');
+              // element.innerHTML = '<h3>Thank you for your payment!</h3>';
+              // Or go to another URL:  actions.redirect('thank_you.html');
+            });
+        },
+      })
+      .render("#paypal-button-container"); */
+
+    // If this returns false or the card fields aren't visible, see Step #1.
+    if (paypal.HostedFields.isEligible()) {
+      let orderId;
+
+      // Renders card fields
+      paypal.HostedFields.render({
+        // Call your server to set up the transaction
+        createOrder: () => {
+          return fetch("/api/orders", {
+            method: "post",
+            // use the "body" param to optionally pass additional order information like
+            // product ids or amount.
+          })
+            .then((res) => res.json())
+            .then((orderData) => {
+              orderId = orderData.id; // needed later to complete capture
+              return orderData.id;
+            });
+        },
+        styles: {
+          ".valid": {
+            color: "green",
+          },
+          ".invalid": {
+            color: "red",
+          },
+        },
+        fields: {
+          number: {
+            selector: "#card-number",
+            placeholder: "4111 1111 1111 1111",
+          },
+          cvv: {
+            selector: "#cvv",
+            placeholder: "123",
+          },
+          expirationDate: {
+            selector: "#expiration-date",
+            placeholder: "MM/YY",
+          },
+        },
+      }).then((cardFields) => {
+        document.querySelector("#card-form").addEventListener("submit", (event) => {
+          event.preventDefault();
+          cardFields
+            .submit({
+              // Cardholder's first and last name
+              cardholderName: document.getElementById("card-holder-name").value,
+              // Billing Address
+              billingAddress: {
+                // Street address, line 1
+                streetAddress: document.getElementById(
+                  "card-billing-address-street"
+                ).value,
+                // Street address, line 2 (Ex: Unit, Apartment, etc.)
+                extendedAddress: document.getElementById(
+                  "card-billing-address-unit"
+                ).value,
+                // State
+                region: document.getElementById("card-billing-address-state").value,
+                // City
+                locality: document.getElementById("card-billing-address-city")
+                  .value,
+                // Postal Code
+                postalCode: document.getElementById("card-billing-address-zip")
+                  .value,
+                // Country Code
+                countryCodeAlpha2: document.getElementById(
+                  "card-billing-address-country"
+                ).value,
+              },
+            })
+            .then(() => {
+              fetch(`/api/orders/${orderId}/capture`, {
+                method: "post",
+              })
+                .then((res) => res.json())
+                .then((orderData) => {
+                  // Two cases to handle:
+                  //   (1) Other non-recoverable errors -> Show a failure message
+                  //   (2) Successful transaction -> Show confirmation or thank you
+                  // This example reads a v2/checkout/orders capture response, propagated from the server
+                  // You could use a different API or structure for your 'orderData'
+                  const errorDetail =
+                    Array.isArray(orderData.details) && orderData.details[0];
+                  if (errorDetail) {
+                    var msg = "Sorry, your transaction could not be processed.";
+                    if (errorDetail.description)
+                      msg += "\n\n" + errorDetail.description;
+                    if (orderData.debug_id) msg += " (" + orderData.debug_id + ")";
+                    return alert(msg); // Show a failure message
+                  }
+                  // Show a success message or redirect
+                  alert("Transaction completed!");
+                });
+            })
+            .catch((err) => {
+              alert("Payment could not be captured! " + JSON.stringify(err));
+            });
+        });
+      });
+    } else {
+      // Hides card fields if the merchant isn't eligible
+      document.querySelector("#card-form").style = "display: none";
+    }</script> -->
+    <div id="paypal-button-container" class="paypal-button-container"></div>
+	<script>
+/* /*     import fetch from "node-fetch";
+ // base URL will need to change for production applications
+    const base = "https://api-m.sandbox.paypal.com";
+
+   /*  const { CLIENT_ID, APP_SECRET } = process.env; // pull from environment variables
+ */
+/*     // call this function to create your client token
+    async function generateClientToken() {
+      const accessToken = await generateAccessToken();
+      const response = await fetch(`${base}/v1/identity/generate-token`, {
+        method: "post",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Accept-Language": "en_US",
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+      return data.client_token;
+    }  */
+
+/*     // access token is used to authenticate all REST API requests
+    async function generateAccessToken() {
+      const auth = Buffer.from("AVphOMs_pA3wb_mRc28gFGQ2ub5PB-0-mftxaiD5jV1dqqgwj9QTpFN6LpzAqvVGc_zmbaY3_OmA0H_h" + ":" + "EFzHngC8HhACSWuMqGNdcVtNl2TQyp2Sa192oq0Rr-Tp7lgjjWOAaqxniQJhIUuCWtTv_AkcnRz81pFS").toString("base64");
+      const response = await fetch(`${base}/v1/oauth2/token`, {
+        method: "post",
+        body: "grant_type=client_credentials",
+        headers: {
+          Authorization: `Basic ${auth}`,
+        },
+      });
+      const data = await response.json();
+      return data.access_token;
+    } */ 
+    paypal
+    .Buttons({
+      // Sets up the transaction when a payment button is clicked
+      createOrder: function (data, actions) {
+        return fetch("/api/orders", {
+          method: "post",
+          // use the "body" param to optionally pass additional order information
+          // like product ids or amount
+        })
+          .then((response) => response.json())
+          .then((order) => order.id);
+      },
+      // Finalize the transaction after payer approval
+      onApprove: function (data, actions) {
+        return fetch(`/api/orders/${data.orderID}/capture`, {
+          method: "post",
+        })
+          .then((response) => response.json())
+          .then((orderData) => {
+            // Successful capture! For dev/demo purposes:
+            console.log( "Capture result", orderData, JSON.stringify(orderData, null, 2));
+            var transaction = orderData.purchase_units[0].payments.captures[0];
+            alert(`Transaction ${transaction.status}: ${transaction.id}
+
+              See console for all available details
+            `);
+            // When ready to go live, remove the alert and show a success message within this page. For example:
+            // var element = document.getElementById('paypal-button-container');
+            // element.innerHTML = '<h3>Thank you for your payment!</h3>';
+            // Or go to another URL:  actions.redirect('thank_you.html');
+          });
+      },
+    })
+    .render("#paypal-button-container");
+ // renders each checkout page with a unique client token
+   ("/", async (req, res) => {
+      const clientId = process.env.CLIENT_ID;
+      const clientToken = await paypal.generateClientToken();
+      res.render("checkout", { clientId, clientToken });
+    });
+ 
+// create an order
+   async function createOrder() {
+     const purchaseAmount = "100.00"; // TODO: pull amount from a database or session
+     const accessToken = await generateAccessToken();
+     const url = `${base}/v2/checkout/orders`;
+     const response = await fetch(url, {
+       method: "post",
+       headers: {
+         "Content-Type": "application/json",
+         Authorization: `Bearer ${accessToken}`,
+       },
+       body: JSON.stringify({
+         intent: "CAPTURE",
+         purchase_units: [
+           {
+             amount: {
+               currency_code: "US",
+               value: purchaseAmount
+             },
+           },
+         ],
+       }),
+     });
+     const data = await response.json();
+     return data;
+   }
+
+/*    // capture payment for an order
+   async function capturePayment(orderId) {
+     const accessToken = await generateAccessToken();
+     const url = `${base}/v2/checkout/orders/${orderId}/capture`;
+     const response = await fetch(url, {
+       method: "post",
+       headers: {
+         "Content-Type": "application/json",
+         Authorization: `Bearer ${accessToken}`,
+       },
+     });
+     const data = await response.json();
+     return data;
+   } */
+/* // If this returns false or the card fields aren't visible, see Step #1.
+   if (paypal.HostedFields.isEligible()) {
+     let orderId;
+
+     // Renders card fields
+     paypal.HostedFields.render({
+       // Call your server to set up the transaction
+       createOrder: () => {
+         return fetch("/api/orders", {
+           method: 'post'
+           // use the "body" param to optionally pass additional order information like
+           // product ids or amount.
+         })
+         .then((res) => res.json())
+         .then((orderData) => {
+           orderId = orderData.id; // needed later to complete capture
+           return orderData.id
+         })
+       },
+       styles: {
+         '.valid': {
+           color: 'green'
+         },
+         '.invalid': {
+           color: 'red'
+         }
+       },
+       fields: {
+         number: {
+           selector: "#card-number",
+           placeholder: "4111 1111 1111 1111"
+         },
+         cvv: {
+           selector: "#cvv",
+           placeholder: "123"
+         },
+         expirationDate: {
+           selector: "#expiration-date",
+           placeholder: "MM/YY"
+         }
+       }
+     }).then((cardFields) => {
+      document.querySelector("#card-form").addEventListener("submit", (event) => {
+         event.preventDefault();
+         cardFields
+           .submit({
+             // Cardholder's first and last name
+             cardholderName: document.getElementById("card-holder-name").value,
+             // Billing Address
+             billingAddress: {
+               // Street address, line 1
+               streetAddress: document.getElementById(
+                 "card-billing-address-street"
+               ).value,
+               // Street address, line 2 (Ex: Unit, Apartment, etc.)
+               extendedAddress: document.getElementById(
+                 "card-billing-address-unit"
+               ).value,
+               // State
+               region: document.getElementById("card-billing-address-state").value,
+               // City
+               locality: document.getElementById("card-billing-address-city")
+                 .value,
+               // Postal Code
+               postalCode: document.getElementById("card-billing-address-zip")
+                 .value,
+               // Country Code
+               countryCodeAlpha2: document.getElementById(
+                 "card-billing-address-country"
+               ).value,
+             },
+           })
+           .then(() => {
+             fetch(`/api/orders/${orderId}/capture`, {
+               method: "post",
+             })
+               .then((res) => res.json())
+               .then((orderData) => {
+                 // Three cases to handle:
+                 //   (1) Recoverable INSTRUMENT_DECLINED -> call actions.restart()
+                 //   (2) Other non-recoverable errors -> Show a failure message
+                 //   (3) Successful transaction -> Show confirmation or thank you
+                 // This example reads a v2/checkout/orders capture response, propagated from the server
+                 // You could use a different API or structure for your 'orderData'
+                 var errorDetail =
+                   Array.isArray(orderData.details) && orderData.details[0];
+                 if (errorDetail && errorDetail.issue === "INSTRUMENT_DECLINED") {
+                   return actions.restart(); // Recoverable state, per:
+                   // https://developer.paypal.com/docs/checkout/integration-features/funding-failure/
+                 }
+                 if (errorDetail) {
+                   var msg = "Sorry, your transaction could not be processed.";
+                   if (errorDetail.description)
+                     msg += "\n\n" + errorDetail.description;
+                   if (orderData.debug_id) msg += " (" + orderData.debug_id + ")";
+                   return alert(msg); // Show a failure message
+                 }
+                 // Show a success message or redirect
+                 alert("Transaction completed!");
+               });
+           })
+           .catch((err) => {
+             alert("Payment could not be captured! " + JSON.stringify(err));
+           });
+       });
+     });
+   } else {
+     // Hides card fields if the merchant isn't eligible
+     document.querySelector("#card-form").style = 'display: none';
+   } */
+    </script>
+    <div class="card_container">
+  <form id="card-form">
+    <label for="card-number">Card Number</label><div id="card-number" class="card_field"></div>
+    <div>
+      <label for="expiration-date">Expiration Date</label>
+      <div id="expiration-date" class="card_field"></div>
+    </div>
+    <div>
+      <label for="cvv">CVV</label><div id="cvv" class="card_field"></div>
+    </div>
+    <label for="card-holder-name">Name on Card</label>
+    <input type="text" id="card-holder-name" name="card-holder-name" autocomplete="off" placeholder="card holder name"/>
+    <div>
+      <label for="card-billing-address-street">Billing Address</label>
+      <input type="text" id="card-billing-address-street" name="card-billing-address-street" autocomplete="off" placeholder="street address"/>
+    </div>
+    <div>
+      <label for="card-billing-address-unit">&nbsp;</label>
+      <input type="text" id="card-billing-address-unit" name="card-billing-address-unit" autocomplete="off" placeholder="unit"/>
+    </div>
+    <div>
+      <input type="text" id="card-billing-address-city" name="card-billing-address-city" autocomplete="off" placeholder="city"/>
+    </div>
+    <div>
+      <input type="text" id="card-billing-address-state" name="card-billing-address-state" autocomplete="off" placeholder="state"/>
+    </div>
+    <div>
+      <input type="text" id="card-billing-address-zip" name="card-billing-address-zip" autocomplete="off" placeholder="zip / postal code"/>
+    </div>
+    <div>
+      <input type="text" id="card-billing-address-country" name="card-billing-address-country" autocomplete="off" placeholder="country code" />
+    </div>
+    <br/><br/>
+    <button value="submit" id="submit" class="btn">Pay</button>
+  </form>
+</div>
+	<div th:replace="fragments/FinantierPay_footer"></div>
 </body>
 </html>
