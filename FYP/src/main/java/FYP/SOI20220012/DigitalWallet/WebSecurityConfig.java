@@ -86,7 +86,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
 		.antMatcher("/**").authorizeRequests()
 		.antMatchers("/register", "/verify", "/process_register","/about","/faq").permitAll()
 		.antMatchers("/forgot_password", "/reset_password").permitAll()
-		.antMatchers("/cswshoes", "/pagetwo/*", "/shoppingcart", "/shoppingcart/add/*", "/shoppingcart/delete/*", "/shoppingcart/edit/*", "/transaction_successful", "/shoppincart/receipt").permitAll()
+		.antMatchers("/cswshoes", "/pagetwo/*", "/shoppingcart", "/shoppingcart/add/*", "/shoppingcart/delete/*", "/shoppingcart/edit/*", "/transaction_successful/receipt", "/transaction_successful", "/shoppingcart/receipt").permitAll()
 		.antMatchers("/finantierPayPayment", "/finantierPaylogin", "/finantierPay/login").permitAll()
 		.antMatchers("/chooseWalletToPay", "/chooseWalletTransfer", "/chooseWalletToTransfer/process_transfer", "/chooseWalletToTransfer/save", "/chooseWalletToTopUp", "/chooseWalletToTopUp/process_topup", "/walletpin", "/paymentsuccess").hasRole("USER")
 		.antMatchers("/bootstrap/*/*").permitAll()
