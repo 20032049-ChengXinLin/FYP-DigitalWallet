@@ -95,20 +95,8 @@ public class ShoppingCartController {
 
 		return "shopping_cart";
 	}
-	@GetMapping("/transaction_successful")
-	public String transactionSuccessful(Model model, @RequestParam("totalAmt") String totalAmt,
-			@RequestParam("transactionId") String transactionId, @RequestParam("address") String address,
-			@RequestParam("country") String country, @RequestParam("postalCode") String postalCode) {
-		
-		model.addAttribute("totalAmt", totalAmt);
-		model.addAttribute("transactionId", transactionId);
-		model.addAttribute("address", address);
-		model.addAttribute("country", country);
-		model.addAttribute("postalCode", postalCode);
-		
-		return "transaction_successful";
-	}
-	@PostMapping("/transaction_successful/receipt")
+
+	@PostMapping("/transaction_successful")
 	public String processOrder(Model model, @RequestParam("totalAmt") String cartTotal,
 			@RequestParam("transactionId") String transactionId, @RequestParam("address") String address,
 			@RequestParam("country") String country, @RequestParam("postalCode") String postalCode) {
