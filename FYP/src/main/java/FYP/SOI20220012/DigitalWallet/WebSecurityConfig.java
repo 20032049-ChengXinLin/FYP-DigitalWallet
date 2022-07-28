@@ -103,7 +103,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
 		.antMatchers("/guidelines").hasRole("MERCHANT")
 		.antMatchers("/wallet/*/updateWalletLimit", "/wallet/*/walletLimit","/rewards").hasAnyRole("MERCHANT", "STAFF", "ADMIN", "USER")
 		.antMatchers("/user/account", "/user/voucher/*", "/user/pointhistory/*", "/user/pointearned/*", "/transaction/export/excel").hasAnyRole("ADMIN", "STAFF")
-		.antMatchers("/user/edit/*", "/merchant/edit/*", "/user/voucher/edit/*", "/user/pointsHistory/edit/*","/transactionrecords/edit/*","/transactionrecords/delete/*", "/user/wallet/edit/").hasRole("ADMIN")
+		.antMatchers("/user/edit/*", "/merchant/edit/*", "/user/voucher/edit/*", "/user/pointsHistory/edit/*","/transactionrecords/edit/*","/transactionrecords/delete/*", "/user/wallet/edit/", "/merchant/wallet/*", "/merchant/wallet/edit/*").hasRole("ADMIN")
 		.anyRequest().authenticated()
 		.and()
 		.formLogin()
