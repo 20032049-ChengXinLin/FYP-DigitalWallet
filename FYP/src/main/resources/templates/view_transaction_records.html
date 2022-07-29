@@ -17,7 +17,8 @@
 	<div class="container">
 		<h3 class="text-center">View All Transaction Records</h3>
 		<hr>
-		<a th:href="@{/transaction/export/excel}" class="btn btn-info mb-2">Export to Excel</a>
+		<a th:href="@{/transaction/export/excel}" class="btn btn-info mb-2">Export
+			to Excel</a>
 		<div th:if="${success}" th:text="${success}"
 			class="alert alert-success"></div>
 		<div class="row mb-3">
@@ -173,8 +174,12 @@
 						th:if="${transaction.activity=='Sent'  OR transaction.activity=='Withdraw'}"
 						th:text="${'-' + #numbers.formatCurrency(transaction.amount)}"></td>
 					<td class="text-center" th:if="${transaction.voucher_value == 0}">-</td>
-					<td class="text-center" th:if="${transaction.voucher_value != 0}"
-						th:text="${transaction.voucher_value}"></td>
+					<td class="text-center"
+						th:if="${transaction.voucher_value != 0 And transaction.voucher_value < 1}"
+						th:text="${#numbers.formatPercent(transaction.voucher_value,1,2)}"></td>
+					<td class="text-center"
+						th:if="${transaction.voucher_value != 0 And transaction.voucher_value >= 1}"
+						th:text="${#numbers.formatCurrency(transaction.voucher_value)}"></td>
 					<td th:text="${transaction.activity}"></td>
 					<td class="text-center" th:if="${transaction.points_earned == 0}">-</td>
 					<td class="text-center" th:if="${transaction.points_earned != 0}"
