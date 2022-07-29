@@ -83,10 +83,10 @@ public class ServiceRequestController {
 
 		LocalDate currentDate = LocalDate.now();
 		ServiceRequest firstDateTime = serviceRequestRepository.findTopByOrderByDateTimeAsc();
-		
+
 		DateTimeFormatter dateformatter = DateTimeFormatter.ofPattern("yyy-MM", Locale.ENGLISH);
 		String startMonth = "";
-		if (firstDateTime == null) {		
+		if (firstDateTime == null) {
 			startMonth = currentDate.format(dateformatter);
 		} else {
 			LocalDate firstServiceRequestDateTime = firstDateTime.getDateTime().toLocalDate();
@@ -163,9 +163,14 @@ public class ServiceRequestController {
 	public String saveHelp(@PathVariable("id") int id, @RequestParam("status") String status,
 			RedirectAttributes redirectAttributes) {
 		ServiceRequest serviceRequest = serviceRequestRepository.getById(id);
-		serviceRequest.setStatus(status);
-		serviceRequestRepository.save(serviceRequest);
-		redirectAttributes.addFlashAttribute("Success", "Service Request Id: " + id + " successfully updated.");
+		if (serviceRequest.getStatus().equals(status)) {
+			redirectAttributes.addFlashAttribute("Warning", "No Change was made.");
+		} else {
+			serviceRequest.setStatus(status);
+			serviceRequestRepository.save(serviceRequest);
+			redirectAttributes.addFlashAttribute("Success", "Service Request Id: " + id + " successfully updated.");
+		}
+		
 		return "redirect:/help";
 	}
 

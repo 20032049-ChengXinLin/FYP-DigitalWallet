@@ -21,6 +21,8 @@
 			to Excel</a>
 		<div th:if="${success}" th:text="${success}"
 			class="alert alert-success"></div>
+		<div th:if="${Warning}" th:text="${Warning}"
+			class="alert alert-warning"></div>
 		<div class="row mb-3">
 			<div class="col-md-9">
 				<form th:action="@{/transactionrecords}">
