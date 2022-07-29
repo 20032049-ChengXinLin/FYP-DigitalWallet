@@ -80,7 +80,7 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
 						VOUCHER VALUE: <span th:if="${voucher.voucher_value < 1}"
 							th:text="${#numbers.formatPercent(voucher.voucher_value,1,0)}"></span>
 							<span th:if="${voucher.voucher_value >= 1}"
-							th:text="${#numbers.formatPercent(voucher.voucher_value,1,0)}"></span>
+							th:text="${#numbers.formatCurrency(voucher.voucher_value)}"></span>
 					</h5>
 					<hr>
 					<div class="row">
