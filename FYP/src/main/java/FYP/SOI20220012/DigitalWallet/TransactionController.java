@@ -96,7 +96,7 @@ public class TransactionController {
 		LocalDate end = LocalDate.parse(endMonthYear + "-01", formatter);
 		LocalDateTime startdateTime = LocalDateTime.of(start.getYear(), start.getMonthValue(), 1, 0, 0, 0);
 		System.out.println(startdateTime);
-		LocalDateTime enddateTime = LocalDateTime.of(end.getYear(), end.getMonthValue(), end.lengthOfMonth(), 0, 0, 0);
+		LocalDateTime enddateTime = LocalDateTime.of(end.getYear(), end.getMonthValue(), end.lengthOfMonth(),  23, 59, 59);
 		System.out.println(enddateTime);
 
 		if (activity.equals("null") && status.equals("null") && keyword.equals("") && archive.equals("null")) {
@@ -244,7 +244,7 @@ public class TransactionController {
 		LocalDate end = LocalDate.parse(endMonthYear + "-01", formatter);
 		LocalDateTime startdateTime = LocalDateTime.of(start.getYear(), start.getMonthValue(), 1, 0, 0, 0);
 		System.out.println(startdateTime);
-		LocalDateTime enddateTime = LocalDateTime.of(end.getYear(), end.getMonthValue(), end.lengthOfMonth(), 0, 0, 0);
+		LocalDateTime enddateTime = LocalDateTime.of(end.getYear(), end.getMonthValue(), end.lengthOfMonth(), 23, 59, 59);
 		System.out.println(enddateTime);
 
 		if (activity.equals("null") && status.equals("null") && keyword.equals("")) {
@@ -427,7 +427,7 @@ public class TransactionController {
 		LocalDate end = LocalDate.parse(endMonthYear + "-01", formatter);
 		LocalDateTime startdateTime = LocalDateTime.of(start.getYear(), start.getMonthValue(), 1, 0, 0, 0);
 		System.out.println(startdateTime);
-		LocalDateTime enddateTime = LocalDateTime.of(end.getYear(), end.getMonthValue(), end.lengthOfMonth(), 0, 0, 0);
+		LocalDateTime enddateTime = LocalDateTime.of(end.getYear(), end.getMonthValue(), end.lengthOfMonth(),  23, 59, 59);
 		System.out.println(enddateTime);
 
 		if (activity.equals("null") && status.equals("null") && keyword.equals("")) {
@@ -531,7 +531,7 @@ public class TransactionController {
 		LocalDate end = LocalDate.parse(endMonthYear + "-01", formatter);
 		LocalDateTime startdateTime = LocalDateTime.of(start.getYear(), start.getMonthValue(), 1, 0, 0, 0);
 		System.out.println(startdateTime);
-		LocalDateTime enddateTime = LocalDateTime.of(end.getYear(), end.getMonthValue(), end.lengthOfMonth(), 0, 0, 0);
+		LocalDateTime enddateTime = LocalDateTime.of(end.getYear(), end.getMonthValue(), end.lengthOfMonth(),  23, 59, 59);
 		System.out.println(enddateTime);
 
 		if (activity.equals("null") && status.equals("null") && keyword.equals("") && archive.equals("null")) {
@@ -685,7 +685,7 @@ public class TransactionController {
 		LocalDate end = LocalDate.parse(endMonthYear + "-01", formatter);
 		LocalDateTime startdateTime = LocalDateTime.of(start.getYear(), start.getMonthValue(), 1, 0, 0, 0);
 		System.out.println(startdateTime);
-		LocalDateTime enddateTime = LocalDateTime.of(end.getYear(), end.getMonthValue(), end.lengthOfMonth(), 0, 0, 0);
+		LocalDateTime enddateTime = LocalDateTime.of(end.getYear(), end.getMonthValue(), end.lengthOfMonth(), 23, 59, 59);
 		System.out.println(enddateTime);
 
 		if (activity.equals("null") && status.equals("null") && keyword.equals("") && archive.equals("null")) {
